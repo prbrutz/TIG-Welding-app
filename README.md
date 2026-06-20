@@ -21,7 +21,9 @@ Twelve alloys are covered: mild steel, 4130/4140 chromoly, 304/316 and 410/430 s
 
 ## Using it
 
-No installation or account needed — it's a single static HTML file. Open the link above in any browser, on desktop or mobile. On a phone, add it to your home screen for app-like access.
+No installation or account needed — it's a single static HTML file. Open the link above in any browser, on desktop or mobile.
+
+**Install it on your phone:** in Safari (iPhone) or Chrome (Android), open the link, tap the Share / menu button, and choose **Add to Home Screen**. It installs with its own app icon and launches full-screen, like a native app.
 
 ## A note on the numbers
 

@@ -1,0 +1,16 @@
+{
+  "name": "TIG Console",
+  "short_name": "TIG Console",
+  "description": "TIG (GTAW) welding parameter reference: filler, tungsten, gas, amperage and pulse.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#100d0b",
+  "theme_color": "#100d0b",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "apple-touch-icon.png", "sizes": "180x180", "type": "image/png" }
+  ]
+}
