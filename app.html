@@ -248,6 +248,10 @@
   .installbox .why{margin-top:.8rem;font-size:.79rem;color:var(--muted);line-height:1.5;}
   .installbox.done{border-color:rgba(37,214,192,.55);}
   .installbox.done h4{color:var(--teal);}
+  .offline-status{margin-top:.85rem;padding-top:.7rem;border-top:1px solid var(--border);
+    font-family:'JetBrains Mono',monospace;font-size:.63rem;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--muted2);}
+  .offline-status.ready{color:var(--teal);}
   .btn-install{margin-top:.9rem;font-family:'JetBrains Mono',monospace;font-size:.66rem;letter-spacing:.12em;
     text-transform:uppercase;padding:.7rem 1.1rem;border-radius:8px;border:1px solid rgba(37,214,192,.5);
     background:rgba(37,214,192,.12);color:var(--teal);cursor:pointer;transition:all .2s;}
@@ -261,7 +265,7 @@
 
   <div class="topbar">
     <span>GTAW &middot; Tungsten Inert Gas</span>
-    <span class="live"><span class="dot"></span>Parameter Console &middot; v2.1</span>
+    <span class="live"><span class="dot"></span>Parameter Console &middot; v2.2</span>
   </div>
 
   <header>
@@ -329,6 +333,7 @@
     <div class="installbox" id="installCard">
       <h4 id="installTitle">Keep it on your phone</h4>
       <div id="installBody"></div>
+      <div class="offline-status" id="offlineStatus"></div>
     </div>
   </div>
 
@@ -828,6 +833,22 @@ $("savePreset").addEventListener("click",savePreset);
 $("presetName").addEventListener("keydown",function(e){if(e.key==="Enter")savePreset();});
 
 Store.load().then(function(arr){presets=arr||[];renderPresets();renumber();});
+
+/* OFFLINE / SERVICE WORKER */
+(function(){
+  var el=function(){return document.getElementById("offlineStatus");};
+  function set(txt,ready){var e=el();if(e){e.textContent=txt;e.classList.toggle("ready",!!ready);}}
+  if(!("serviceWorker" in navigator)){ set("Offline mode not supported by this browser",false); return; }
+  window.addEventListener("load",function(){
+    navigator.serviceWorker.register("sw.js").then(function(){
+      if(navigator.serviceWorker.controller) set("\u2713 Saved for offline use \u2014 opens with no signal",true);
+      else set("Saving for offline use\u2026 reload once to finish",false);
+      navigator.serviceWorker.addEventListener("controllerchange",function(){
+        set("\u2713 Saved for offline use \u2014 opens with no signal",true);
+      });
+    }).catch(function(){ set("Offline caching unavailable",false); });
+  });
+})();
 
 /* INSTALL HELPER */
 (function(){

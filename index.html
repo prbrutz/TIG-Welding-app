@@ -297,7 +297,7 @@
       <p>No install, no account to use the tool. Add it to your phone and it runs full-screen, remembers your saved setups, and works right at the bench.</p>
       <div class="steps">
         <div class="step"><span class="n">01</span><span class="t"><b>Launch the console</b> &mdash; it opens straight in your browser, nothing to install.</span></div>
-        <div class="step"><span class="n">02</span><span class="t"><b>iPhone:</b> tap <b>Share</b> &rarr; <b>Add to Home Screen</b>. <b>Android:</b> menu &rarr; <b>Install app</b>. Now it opens like an app and remembers your saved setups.</span></div>
+        <div class="step"><span class="n">02</span><span class="t"><b>Launch the console first</b>, then install from that page &mdash; iPhone: <b>Share</b> &rarr; <b>Add to Home Screen</b>; Android: menu &rarr; <b>Install app</b>. It then opens like an app, works offline, and remembers your setups.</span></div>
       </div>
       <a class="btn btn-primary" href="app.html">Launch the console ▸</a>
     </div>
@@ -318,6 +318,13 @@
 <script>
 "use strict";
 var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* offline service worker */
+if("serviceWorker" in navigator){
+  window.addEventListener("load",function(){
+    navigator.serviceWorker.register("sw.js").catch(function(){});
+  });
+}
 
 /* scroll reveal */
 (function(){
