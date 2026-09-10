@@ -3,7 +3,7 @@
    Bump VERSION whenever you upload new HTML. */
 "use strict";
 
-var VERSION = "tig-console-v2.2";
+var VERSION = "tig-console-v2.3";
 var CORE    = VERSION + "-core";
 var FONTS   = VERSION + "-fonts";
 
