@@ -246,7 +246,7 @@
 
   <div class="topbar">
     <span>GTAW &middot; Tungsten Inert Gas</span>
-    <span class="live"><span class="dot"></span>Parameter Console &middot; v2.0</span>
+    <span class="live"><span class="dot"></span>Parameter Console &middot; v2.1</span>
   </div>
 
   <header>
@@ -732,9 +732,21 @@ window.addEventListener("resize",fitCanvas);
 var PKEY="tig_console_presets_v1";
 var presets=[];
 var Store={
-  load:function(){return new Promise(function(res){try{if(window.storage){window.storage.get(PKEY).then(function(r){
-      try{res(r&&r.value?JSON.parse(r.value):[]);}catch(e){res([]);}}).catch(function(){res([]);});return;}}catch(e){}res([]);});},
-  save:function(arr){try{if(window.storage){window.storage.set(PKEY,JSON.stringify(arr));}}catch(e){}}
+  available:function(){
+    try{ var k="__tig_t"; window.localStorage.setItem(k,"1"); window.localStorage.removeItem(k); return true; }
+    catch(e){ return !!(window.storage && window.storage.get); }
+  },
+  load:function(){return new Promise(function(res){
+    try{ if(window.localStorage){ var raw=window.localStorage.getItem(PKEY);
+      res(raw?JSON.parse(raw):[]); return; } }catch(e){}
+    try{ if(window.storage&&window.storage.get){ window.storage.get(PKEY).then(function(r){
+      try{res(r&&r.value?JSON.parse(r.value):[]);}catch(e){res([]);} }).catch(function(){res([]);}); return; } }catch(e){}
+    res([]);});},
+  save:function(arr){
+    var json=JSON.stringify(arr);
+    try{ if(window.localStorage){ window.localStorage.setItem(PKEY,json); return true; } }catch(e){}
+    try{ if(window.storage&&window.storage.set){ window.storage.set(PKEY,json); return true; } }catch(e){}
+    return false;}
 };
 function shortThick(t){var opts=$("thickness").options;for(var i=0;i<opts.length;i++){if(opts[i].value===t)return opts[i].text.split("\u00b7")[0].trim();}return t+'"';}
 function presetMeta(p){
@@ -770,7 +782,13 @@ function savePreset(){
     alloy:S.alloy,thickness:S.thickness,pulseOn:S.pulseOn,peak:S.peak,bg:S.bg,peakPct:S.peakPct,
     freqSlider:S.freqSlider,acBalance:S.acBalance,acFreq:S.acFreq});
   $("presetName").value="";
-  Store.save(presets);renderPresets();
+  var ok=Store.save(presets);
+  renderPresets();
+  var sub=document.querySelector(".save-sub");
+  if(sub){ sub.textContent = ok
+    ? "Captures alloy, thickness, gas, AC and pulse settings \u00b7 saved in this browser on this device."
+    : "Heads up: this browser is blocking storage (private browsing?), so setups will not survive a reload."; 
+    sub.style.color = ok ? "" : "#ff6a3d"; }
 }
 function loadPreset(id){
   var p=null;for(var i=0;i<presets.length;i++){if(presets[i].id===id){p=presets[i];break;}}
