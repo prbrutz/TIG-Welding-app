@@ -237,6 +237,21 @@
   .pk{border:1px solid var(--border);border-radius:9px;padding:.85rem 1rem;background:var(--panel);}
   .pk .n{font-family:'JetBrains Mono',monospace;font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:.3rem;}
   .pk .d{font-size:.8rem;color:var(--muted);font-weight:300;line-height:1.5;}
+  .installbox{margin-top:1rem;border:1px solid rgba(37,214,192,.32);border-radius:12px;padding:1.15rem 1.3rem;
+    background:linear-gradient(180deg,rgba(37,214,192,.08),transparent);}
+  .installbox h4{font-family:'JetBrains Mono',monospace;font-size:.68rem;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--teal);margin-bottom:.6rem;}
+  .installbox p{font-size:.86rem;color:var(--text);font-weight:300;line-height:1.6;}
+  .installbox ol{margin:.7rem 0 0 1.2rem;display:flex;flex-direction:column;gap:.4rem;}
+  .installbox li{font-size:.86rem;color:var(--text);font-weight:300;line-height:1.5;}
+  .installbox li b{color:#fff;font-weight:600;}
+  .installbox .why{margin-top:.8rem;font-size:.79rem;color:var(--muted);line-height:1.5;}
+  .installbox.done{border-color:rgba(37,214,192,.55);}
+  .installbox.done h4{color:var(--teal);}
+  .btn-install{margin-top:.9rem;font-family:'JetBrains Mono',monospace;font-size:.66rem;letter-spacing:.12em;
+    text-transform:uppercase;padding:.7rem 1.1rem;border-radius:8px;border:1px solid rgba(37,214,192,.5);
+    background:rgba(37,214,192,.12);color:var(--teal);cursor:pointer;transition:all .2s;}
+  .btn-install:hover{background:rgba(37,214,192,.22);}
   footer{margin-top:3.4rem;padding-top:1.3rem;border-top:1px solid var(--border);font-family:'JetBrains Mono',monospace;
     font-size:.62rem;letter-spacing:.1em;color:var(--muted2);text-align:center;line-height:1.7;}
 </style>
@@ -309,7 +324,11 @@
         <button class="btn" id="savePreset">&#65291; Save current</button>
       </div>
       <div id="presetList" class="presetlist"></div>
-      <div class="save-sub">Captures alloy, thickness, gas, AC and pulse settings &middot; stored on this device where your browser allows.</div>
+      <div class="save-sub">Captures alloy, thickness, gas, AC and pulse settings &middot; saved in this browser on this device.</div>
+    </div>
+    <div class="installbox" id="installCard">
+      <h4 id="installTitle">Keep it on your phone</h4>
+      <div id="installBody"></div>
     </div>
   </div>
 
@@ -809,6 +828,52 @@ $("savePreset").addEventListener("click",savePreset);
 $("presetName").addEventListener("keydown",function(e){if(e.key==="Enter")savePreset();});
 
 Store.load().then(function(arr){presets=arr||[];renderPresets();renumber();});
+
+/* INSTALL HELPER */
+(function(){
+  var card=$("installCard"), body=$("installBody"), title=$("installTitle");
+  if(!card) return;
+  var standalone = (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches)
+                   || window.navigator.standalone===true;
+  var ua=navigator.userAgent||"";
+  var isIOS=/iPad|iPhone|iPod/.test(ua) || (navigator.platform==="MacIntel" && navigator.maxTouchPoints>1);
+  var isAndroid=/Android/.test(ua);
+  var deferred=null;
+
+  if(standalone){
+    card.classList.add("done");
+    title.textContent="Installed on this device";
+    body.innerHTML='<p>You are running the installed app. Setups you save here stay on this device, '+
+      'and open instantly the next time you tap the icon.</p>';
+    return;
+  }
+  if(isIOS){
+    body.innerHTML='<p>Add TIG Console to your Home Screen so it opens like an app and your saved setups stick around.</p>'+
+      '<ol><li>Tap the <b>Share</b> button at the bottom of Safari (the square with the up arrow).</li>'+
+      '<li>Scroll down and tap <b>Add to Home Screen</b>.</li>'+
+      '<li>Tap <b>Add</b>. The TIG Console icon appears on your Home Screen.</li></ol>'+
+      '<p class="why">Worth doing: iPhones clear stored data for websites you have not opened in a while, '+
+      'but installed Home Screen apps are exempt. Save your setups <b>after</b> installing &mdash; the installed '+
+      'app keeps its own separate storage from Safari.</p>';
+  } else if(isAndroid){
+    body.innerHTML='<p>Install TIG Console so it opens like an app and your saved setups stick around.</p>'+
+      '<ol><li>Tap the <b>\u22ee</b> menu in Chrome.</li>'+
+      '<li>Tap <b>Install app</b> (or <b>Add to Home screen</b>).</li>'+
+      '<li>Confirm. The icon appears with your other apps.</li></ol>'+
+      '<p class="why">Save your setups after installing &mdash; the installed app may keep its own storage.</p>';
+    window.addEventListener("beforeinstallprompt",function(e){
+      e.preventDefault(); deferred=e;
+      var b=document.createElement("button");
+      b.className="btn-install"; b.textContent="\u2b07 Install app";
+      b.onclick=function(){ deferred.prompt(); deferred.userChoice.then(function(){ b.remove(); }); };
+      body.appendChild(b);
+    });
+  } else {
+    body.innerHTML='<p>On a phone you can install TIG Console to the Home Screen so it opens like an app. '+
+      'On a computer, bookmark this page &mdash; your saved setups live in this browser on this device.</p>'+
+      '<p class="why">Setups do not sync between browsers or devices.</p>';
+  }
+})();
 </script>
 </body>
 </html>
